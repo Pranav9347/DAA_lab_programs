@@ -1,62 +1,52 @@
-#include<iostream>
-#include<unordered_map>
-#include<vector>
+#include <iostream>
+#include <vector>
+#include <string>
+
 using namespace std;
-class Solution
-{
-    public:
-    pair<int,int> longest_UniqueSong(vector<int> playlist)
-    {
-        unordered_map<int,int> mp;
-        int len=0;
-        int maxlen=0;
-        int start=0;
-        int bestStart=0;
-        for(int i=0;i<playlist.size();i++)
-        {
-            int song=playlist[i];
-            if(mp.find(song)!=mp.end()&&mp[song]>=start)
-            {
-                start=mp[song]+1;
-                len=i-start+1;
-            }
-            else
-            {
-                len++;
-            }
-            mp[song]=i;
-            if(len>maxlen)
-            {
-                maxlen=len;
-                bestStart=start;
+
+string findLCS(const string& X, const string& Y) {
+    int m = X.length();
+    int n = Y.length();
+
+    // Create and initialize a 2D table to store LCS lengths
+    vector<vector<int>> dp(m + 1, vector<int>(n + 1, 0));
+
+    // Build the dp table
+    for (int i = 1; i <= m; i++) {
+        for (int j = 1; j <= n; j++) {
+            if (X[i - 1] == Y[j - 1]) {
+                dp[i][j] = dp[i - 1][j - 1] + 1;
+            } else {
+                dp[i][j] = max(dp[i - 1][j], dp[i][j - 1]);
             }
         }
-        return make_pair(bestStart,maxlen);
     }
-};
 
-int main()
-{
-    vector<int> playList;
-    Solution obj;
-    int n;
-    cout<<"Size of the playlist:"<<endl;
-    cin>>n;
-    cout<<"Enter the playList"<<endl;
-    for(int i=0;i<n;i++)
-    {
-        int val;
-        cin>>val;
-        playList.push_back(val);
+    // Reconstruct the LCS
+    string lcs;
+    int i = m, j = n;
+    while (i > 0 && j > 0) {
+        if (X[i - 1] == Y[j - 1]) {
+            lcs = X[i - 1] + lcs;
+            i--;
+            j--;
+        } else if (dp[i - 1][j] > dp[i][j - 1]) {
+            i--;
+        } else {
+            j--;
+        }
     }
-    pair<int,int> result=obj.longest_UniqueSong(playList);
-    int len=result.second;
-    int i=result.first;
-    cout<<"Answer:"<<endl;
-    while(len--)
-    {
-        cout<<playList[i];
-        i++;
-    }
+
+    return lcs;
+}
+
+int main() {
+    string X = "ABCBDAB";
+    string Y = "BDCAB";
+
+    string lcs = findLCS(X, Y);
+
+    cout << "Longest Common Subsequence: " << lcs << endl;
+
     return 0;
 }
